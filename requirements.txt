@@ -1,0 +1,3 @@
+git+https://github.com/SilvairGit/Python-UartModem-Common.git
+git+https://github.com/SilvairGit/Python-UartModem-OTAU.git
+nose
