@@ -17,6 +17,30 @@ from silvair_health_client.health_client_evt_mgr import HealtClientEventMgr
 from silvair_health_client.utils import ModelIdToInstanceIndexMapper, HealthClientOpcodesDispatcher
 
 
+WELCOME_MSG = """\
+[ Python Health Client ]
+
+This script allow to get Health information from the nodes in the mesh network.
+
+How it works?
+    - Script send MeshMessageRequest to the UART Modem which forward it to the mesh network.
+    - Responses from the mesh network are printed out directly on the screen.
+
+Communication process:
+    Sending request message:
+        [ Script ]  == (UART) ==> [ UART Modem ] ))) (Bluetooth Mesh) ))) [ Mesh Network ]
+
+    Receiving status message:
+        [ Mesh Network ] ))) (Bluetooth Mesh) ))) [ UART Modem ] == (UART) ==> [ Script ]
+
+How to use?
+    - Get UART Modem in unprovisioned state.
+    - Run this script.
+    - Add UART Modem to the network (script must be running).
+    - You're ready to go.
+"""
+
+
 def create_uart_adapter_and_uart_fsm(com_port, event_mgr):
     """ Function creates instances required to connect to UART. """
     uart_adapter = UartAdapter(com_port)
@@ -38,8 +62,13 @@ def parse_cli_args():
 if __name__ == "__main__":
     args = parse_cli_args()
 
+    console_out = None
+    uart_adapter = None
+
     try:
         console_out = ConsoleOut()
+        console_out.print_standard_message(WELCOME_MSG)
+
         hc_status_printer = HealthClientStatusPrinter(console_out)
 
         opcodes_disp = HealthClientOpcodesDispatcher({
@@ -49,15 +78,15 @@ if __name__ == "__main__":
             HealthClientOpcodes.PERIOD_STATUS: hc_status_printer.print_period_status
         })
 
-        mid_to_ii_mapper = ModelIdToInstanceIndexMapper()
+        mid_to_ii_mapper = ModelIdToInstanceIndexMapper(console_out)
         event_mgr = HealtClientEventMgr(console_out, mid_to_ii_mapper, opcodes_disp)
 
         uart_adapter, uart_fsm, sender = create_uart_adapter_and_uart_fsm(args.port, event_mgr)
         uart_adapter.start()
         uart_fsm.start()
 
-        print("Please reset device to map models into instance indexes.")
-        print("Waiting for response from device...")
+        console_out.print_informative_message("Please reset device to map models into instance indexes.")
+        console_out.print_standard_message("Waiting for response from device...")
 
         timeout = 10
         timeout_time = time.time() + timeout
@@ -68,19 +97,22 @@ if __name__ == "__main__":
 
             time.sleep(0.1)
         else:
-            print("Could not get response from device within {}s.".format(timeout))
+            console_out.print_error_message("Could not get response from device within {}s.".format(timeout))
             sys.exit(1)
 
         # Take first registered Health Client model
         hc_instance_idx = mid_to_ii_mapper[ModelID.HealthClientID][0]
 
-        print("Ready...")
+        console_out.print_standard_message("Ready...")
 
         health_client_cli = HealthClientCli(console_out, HealthClient(sender, hc_instance_idx))
         health_client_cli.run()
 
     except KeyboardInterrupt:
-        print("KeyboardInterrupt has been caught. Closing application...")
-        uart_adapter.stop()
+        if console_out is not None:
+            console_out.print_informative_message("KeyboardInterrupt has been caught. Closing application...")
+
+        if uart_adapter is not None:
+            uart_adapter.stop()
         
         sys.exit(0)

@@ -1,3 +1,3 @@
-git+https://github.com/SilvairGit/Python-UartModem-Common.git
-git+https://github.com/SilvairGit/Python-UartModem-OTAU.git
+git+https://github.com/SilvairGit/Python-UartModem-Common.git@2.8.0#egg=silvair-uart-common-libs
+git+https://github.com/SilvairGit/Python-UartModem-OTAU.git@2.8.0#egg=silvair-otau-demo
 nose

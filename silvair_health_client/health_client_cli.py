@@ -43,13 +43,16 @@ class HealthClientCli(object):
         self._console_out.print_standard_message("\t[f]ault - commands for get, clear and run tests")
         self._console_out.print_standard_message("\t[p]eriod - commands for set and get Fast Period Divider")
         self._console_out.print_standard_message("\t[q]uit - exit from CLI")
+        self._console_out.print_standard_message("")
+        self._console_out.print_standard_message("Note: parameters that ends with 'u' e.g. 'setu', 'clearu', ...")
+        self._console_out.print_standard_message("      are unacknowledged.")
 
     def _attention_set_usage(self, cmd):
         self._console_out.print_standard_message("Usage: attention {} <attention_s>".format(cmd))
 
     def _attention(self, args):
         if not args:
-            self._console_out.print_standard_message("Usage: attention [get|set|setu] <args>")
+            self._console_out.print_standard_message("Draw attention on the devices in network.\nUsage: attention [get|set|setu] <args>")
             return
 
         cmd = args[0]
@@ -91,7 +94,7 @@ class HealthClientCli(object):
 
     def _fault(self, args):
         if not args:
-            self._console_out.print_standard_message("Usage: fault [get|clear|clearu|test|testu] <args>")
+            self._console_out.print_standard_message("Clear, get registered faults or perform test.\nUsage: fault [get|clear|clearu|test|testu] <args>")
             return
 
         cmd = args[0]
@@ -145,7 +148,7 @@ class HealthClientCli(object):
 
     def _period(self, args):
         if not args:
-            self._console_out.print_standard_message("Usage: period [get|set|setu] <args>")
+            self._console_out.print_standard_message("Set or get Fast Period Divisor.\nUsage: period [get|set|setu] <args>")
             return
 
         cmd = args[0]

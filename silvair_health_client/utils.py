@@ -2,8 +2,9 @@
 class ModelIdToInstanceIndexMapper(object):
     """ Model Id to Instance Index mapper. """
 
-    def __init__(self):
+    def __init__(self, console_out):
         """ Initalize mapper """
+        self._console_out = console_out
         self._mid_to_iid = []
         self._instance_index = 1
     
@@ -18,7 +19,8 @@ class ModelIdToInstanceIndexMapper(object):
         
         for model_id in model_ids:
             self._mid_to_iid.append(model_id)
-            print("Mapped model_id to instance_index: {:04x} => {}".format(model_id, self._instance_index))
+            self._console_out.print_standard_message("Mapped model_id to instance_index: {:04x} => {}"
+                                                     .format(model_id, self._instance_index))
 
             self._instance_index += 1
 
